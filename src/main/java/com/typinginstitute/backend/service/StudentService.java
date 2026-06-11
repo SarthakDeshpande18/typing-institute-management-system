@@ -17,8 +17,10 @@ public interface StudentService {
 
     StudentResponse getStudentById(Long id);
 
-    PageResult<StudentResponse> getStudents(
-            StudentSearchPageRequest request
-    );
+    PageResult<StudentResponse> getStudents(StudentSearchPageRequest request);
+
+    StudentResponse updateStudent(Long id, StudentRequest request);
+
+    void deleteStudent(Long id);
 
 }

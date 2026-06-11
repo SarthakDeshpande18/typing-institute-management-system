@@ -15,8 +15,11 @@ public class StudentSpecification {
 
         return (root, query, cb) -> {
 
-            List<Predicate> predicates =
-                    new ArrayList<>();
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(
+                    cb.isTrue(root.get("active"))
+            );
 
             if (filters.getFirstName() != null &&
                     !filters.getFirstName().isBlank()) {

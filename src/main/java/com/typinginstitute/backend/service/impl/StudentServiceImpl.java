@@ -39,9 +39,9 @@ public class StudentServiceImpl implements StudentService {
         Student student = StudentMapper.toEntity(request);
 
         student.setRegNo(generateRegNo());
+        student.setActive(true);
 
-        Student savedStudent =
-                studentRepository.save(student);
+        Student savedStudent = studentRepository.save(student);
 
         return StudentMapper.toResponse(savedStudent);
     }
@@ -121,6 +121,55 @@ public class StudentServiceImpl implements StudentService {
 
                 studentPage.getSize()
         );
+    }
+
+    @Override
+    @Transactional
+    public StudentResponse updateStudent(
+            Long id,
+            StudentRequest request
+    ) {
+
+        Student student = studentRepository
+                .findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new BadRequestException("Student not found"));
+
+        if (!student.getMobileNo().equals(request.getMobileNo())
+                && studentRepository.existsByMobileNoAndActiveTrue(
+                request.getMobileNo()
+        )) {
+
+            throw new BadRequestException("Student already exists with mobile number : " + request.getMobileNo()
+            );
+        }
+
+        student.setFirstName(request.getFirstName());
+        student.setLastName(request.getLastName());
+        student.setMobileNo(request.getMobileNo());
+        student.setMotherName(request.getMotherName());
+        student.setAddress(request.getAddress());
+        student.setAdmissionDate(request.getAdmissionDate());
+        student.setSubject(request.getSubject());
+
+        Student updatedStudent =
+                studentRepository.save(student);
+
+        return StudentMapper.toResponse(
+                updatedStudent
+        );
+    }
+
+    @Override
+    @Transactional
+    public void deleteStudent(Long id) {
+
+        Student student = studentRepository
+                .findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new BadRequestException("Student not found"));
+
+        student.setActive(false);
+
+        studentRepository.save(student);
     }
 
     private String generateRegNo() {

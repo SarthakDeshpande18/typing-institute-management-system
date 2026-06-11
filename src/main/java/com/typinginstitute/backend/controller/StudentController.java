@@ -49,4 +49,25 @@ public class StudentController {
         );
     }
 
+    @PutMapping("/{id}")
+    public ApiResponse<StudentResponse> updateStudent(
+            @PathVariable Long id,
+            @Valid @RequestBody StudentRequest request
+    ) {
+
+        return ApiResponse.ok(
+                studentService.updateStudent(id, request), "Student updated successfully"
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteStudent(
+            @PathVariable Long id
+    ) {
+
+        studentService.deleteStudent(id);
+
+        return ApiResponse.ok(null, "Student deleted successfully");
+    }
+
 }
