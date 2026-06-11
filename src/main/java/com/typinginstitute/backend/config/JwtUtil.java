@@ -47,4 +47,36 @@ public class JwtUtil {
 
         return claims.getSubject();
     }
+
+    public Date extractExpiration(String token) {
+
+        SecretKey key =
+                Keys.hmacShaKeyFor(secret.getBytes());
+
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.getExpiration();
+    }
+
+    public boolean isTokenExpired(String token) {
+
+        return extractExpiration(token)
+                .before(new Date());
+    }
+
+    public boolean validateToken(
+            String token,
+            String email
+    ) {
+
+        String username =
+                extractUsername(token);
+
+        return username.equals(email)
+                && !isTokenExpired(token);
+    }
 }
