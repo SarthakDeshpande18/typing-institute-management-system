@@ -72,3 +72,7 @@ application-prod.properties
 /nbbuild/
 /dist/
 /nbdist/
+
+api/target/
+
+target/
