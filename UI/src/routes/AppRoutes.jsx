@@ -4,9 +4,10 @@ import LoginPage from "../features/auth/pages/LoginPage";
 import DashboardPage from "../pages/DashboardPage";
 import StudentListPage from "../features/students/pages/StudentListPage";
 import CreateStudentPage from "../features/students/pages/CreateStudentPage";
-
+import ViewStudentPage from "../features/students/pages/ViewStudentPage";
 import ProtectedRoute from "./ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
+import EditStudentPage from "../features/students/pages/EditStudentPage";
 
 const AppRoutes = () => {
   return (
@@ -38,6 +39,17 @@ const AppRoutes = () => {
             path="/students/create"
             element={<CreateStudentPage />}
           />
+
+          <Route
+            path="/students/:id"
+            element={<ViewStudentPage />}
+          />
+
+          <Route
+            path="/students/edit/:id"
+            element={<EditStudentPage />}
+          />
+
         </Route>
       </Routes>
     </BrowserRouter>
