@@ -4,6 +4,7 @@ import com.typinginstitute.backend.dto.request.StudentFilterRequest;
 import com.typinginstitute.backend.dto.request.StudentRequest;
 import com.typinginstitute.backend.dto.request.StudentSearchPageRequest;
 import com.typinginstitute.backend.dto.response.PageResult;
+import com.typinginstitute.backend.dto.response.PhotoUploadResponse;
 import com.typinginstitute.backend.dto.response.StudentResponse;
 import com.typinginstitute.backend.entity.Student;
 import com.typinginstitute.backend.exception.BadRequestException;
@@ -12,7 +13,14 @@ import com.typinginstitute.backend.repository.StudentRepository;
 import com.typinginstitute.backend.service.StudentService;
 import com.typinginstitute.backend.specifications.StudentSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,11 +28,18 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 @Service
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @Override
     @Transactional
@@ -170,6 +185,64 @@ public class StudentServiceImpl implements StudentService {
         student.setActive(false);
 
         studentRepository.save(student);
+    }
+
+    @Override
+    @Transactional
+    public PhotoUploadResponse uploadStudentPhoto(
+            Long studentId,
+            MultipartFile file
+    ) {
+
+        Student student = studentRepository
+                .findByIdAndActiveTrue(studentId)
+                .orElseThrow(() -> new BadRequestException("Student not found"));
+
+        if (file == null || file.isEmpty()) {
+            throw new BadRequestException("Photo is required"
+            );
+        }
+
+        String originalFilename = file.getOriginalFilename();
+
+        if (originalFilename == null) {
+            throw new BadRequestException("Invalid file");
+        }
+
+        String extension =
+                originalFilename.substring(originalFilename.lastIndexOf(".")
+                ).toLowerCase();
+
+        if (!extension.equals(".jpg") && !extension.equals(".jpeg")) {
+
+            throw new BadRequestException("Only JPG and JPEG files are allowed");
+        }
+
+        try {
+
+            Path uploadPath = Paths.get(uploadDir);
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String fileName = student.getRegNo() + extension;
+
+            Path filePath = uploadPath.resolve(fileName);
+
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING
+            );
+
+            student.setPhotoPath("uploads/photos/" + fileName);
+
+            studentRepository.save(student);
+
+            return new PhotoUploadResponse(student.getPhotoPath());
+
+        } catch (IOException ex) {
+
+            throw new RuntimeException("Failed to upload photo");
+        }
     }
 
     private String generateRegNo() {

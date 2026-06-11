@@ -1,18 +1,17 @@
 package com.typinginstitute.backend.controller;
 
-import com.typinginstitute.backend.dto.request.StudentFilterRequest;
 import com.typinginstitute.backend.dto.request.StudentRequest;
 import com.typinginstitute.backend.dto.request.StudentSearchPageRequest;
 import com.typinginstitute.backend.dto.response.ApiResponse;
 import com.typinginstitute.backend.dto.response.PageResult;
+import com.typinginstitute.backend.dto.response.PhotoUploadResponse;
 import com.typinginstitute.backend.dto.response.StudentResponse;
 import com.typinginstitute.backend.service.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/students")
@@ -70,4 +69,16 @@ public class StudentController {
         return ApiResponse.ok(null, "Student deleted successfully");
     }
 
+
+    @PostMapping(value = "/{id}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<PhotoUploadResponse> uploadPhoto(
+            @PathVariable Long id,
+            @RequestParam("file")
+            MultipartFile file
+    ) {
+
+        return ApiResponse.ok(
+                studentService.uploadStudentPhoto(id, file), "Photo uploaded successfully"
+        );
+    }
 }
