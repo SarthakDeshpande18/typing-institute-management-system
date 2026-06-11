@@ -15,11 +15,18 @@ import {
 } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const drawerWidth = 240;
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <Drawer
@@ -63,7 +70,7 @@ const Sidebar = () => {
           <ListItemText primary="Add Student" />
         </ListItemButton>
 
-        <ListItemButton>
+        <ListItemButton onClick={handleLogout}>
           <ListItemIcon>
             <Logout />
           </ListItemIcon>

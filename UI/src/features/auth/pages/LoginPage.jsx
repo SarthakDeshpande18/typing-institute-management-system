@@ -11,10 +11,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import { loginApi } from "../services/authService";
 import { useAuth } from "../../../context/AuthContext";
+import { useEffect } from "react";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   const [loading, setLoading] = useState(false);
 
@@ -22,6 +23,12 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     setFormData({
