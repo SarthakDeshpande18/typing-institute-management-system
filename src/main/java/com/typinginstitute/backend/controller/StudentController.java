@@ -2,10 +2,8 @@ package com.typinginstitute.backend.controller;
 
 import com.typinginstitute.backend.dto.request.StudentRequest;
 import com.typinginstitute.backend.dto.request.StudentSearchPageRequest;
-import com.typinginstitute.backend.dto.response.ApiResponse;
-import com.typinginstitute.backend.dto.response.PageResult;
-import com.typinginstitute.backend.dto.response.PhotoUploadResponse;
-import com.typinginstitute.backend.dto.response.StudentResponse;
+import com.typinginstitute.backend.dto.response.*;
+import com.typinginstitute.backend.enums.DocumentType;
 import com.typinginstitute.backend.service.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +77,23 @@ public class StudentController {
 
         return ApiResponse.ok(
                 studentService.uploadStudentPhoto(id, file), "Photo uploaded successfully"
+        );
+    }
+
+    @PostMapping(
+            value = "/{id}/documents",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ApiResponse<DocumentUploadResponse> uploadDocument(
+            @PathVariable Long id,
+
+            @RequestParam DocumentType documentType,
+
+            @RequestParam("file")
+            MultipartFile file
+    ) {
+
+        return ApiResponse.ok(studentService.uploadDocument(id, documentType, file), "Document uploaded successfully"
         );
     }
 }

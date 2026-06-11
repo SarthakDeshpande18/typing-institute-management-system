@@ -3,12 +3,16 @@ package com.typinginstitute.backend.service.impl;
 import com.typinginstitute.backend.dto.request.StudentFilterRequest;
 import com.typinginstitute.backend.dto.request.StudentRequest;
 import com.typinginstitute.backend.dto.request.StudentSearchPageRequest;
+import com.typinginstitute.backend.dto.response.DocumentUploadResponse;
 import com.typinginstitute.backend.dto.response.PageResult;
 import com.typinginstitute.backend.dto.response.PhotoUploadResponse;
 import com.typinginstitute.backend.dto.response.StudentResponse;
 import com.typinginstitute.backend.entity.Student;
+import com.typinginstitute.backend.entity.StudentDocument;
+import com.typinginstitute.backend.enums.DocumentType;
 import com.typinginstitute.backend.exception.BadRequestException;
 import com.typinginstitute.backend.mapper.StudentMapper;
+import com.typinginstitute.backend.repository.StudentDocumentRepository;
 import com.typinginstitute.backend.repository.StudentRepository;
 import com.typinginstitute.backend.service.StudentService;
 import com.typinginstitute.backend.specifications.StudentSpecification;
@@ -37,9 +41,13 @@ import java.nio.file.Path;
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
+    private final StudentDocumentRepository studentDocumentRepository;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
+
+    @Value("${file.document-upload-dir}")
+    private String documentUploadDir;
 
     @Override
     @Transactional
@@ -242,6 +250,81 @@ public class StudentServiceImpl implements StudentService {
         } catch (IOException ex) {
 
             throw new RuntimeException("Failed to upload photo");
+        }
+    }
+
+    @Override
+    @Transactional
+    public DocumentUploadResponse uploadDocument(
+            Long studentId,
+            DocumentType documentType,
+            MultipartFile file
+    ) {
+
+        Student student = studentRepository
+                .findByIdAndActiveTrue(studentId)
+                .orElseThrow(() -> new BadRequestException("Student not found"));
+
+        if (studentDocumentRepository.existsByStudentIdAndDocumentType(studentId, documentType))
+        {
+            throw new BadRequestException(documentType.name() + " already uploaded");
+        }
+
+        if (file == null || file.isEmpty())
+        {
+            throw new BadRequestException("Document is required");
+        }
+
+        String originalFileName = file.getOriginalFilename();
+
+        if (originalFileName == null) {
+            throw new BadRequestException("Invalid file");
+        }
+
+        String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+
+        try {
+
+            Path uploadPath = Paths.get(documentUploadDir);
+
+            if (!Files.exists(uploadPath)) {
+
+                Files.createDirectories(uploadPath);
+            }
+
+            String fileName =
+                    student.getRegNo()
+                            + "_"
+                            + documentType.name()
+                            + extension;
+
+            Path filePath = uploadPath.resolve(fileName);
+
+            Files.copy(
+                    file.getInputStream(),
+                    filePath,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
+
+            StudentDocument document =
+                    StudentDocument.builder()
+                            .documentType(documentType)
+                            .filePath("uploads/documents/" + fileName
+                            )
+                            .student(student)
+                            .build();
+
+            StudentDocument savedDocument = studentDocumentRepository.save(document);
+
+            return new DocumentUploadResponse(
+                    savedDocument.getId(),
+                    savedDocument.getDocumentType(),
+                    savedDocument.getFilePath()
+            );
+
+        } catch (IOException ex) {
+
+            throw new RuntimeException("Failed to upload document");
         }
     }
 
