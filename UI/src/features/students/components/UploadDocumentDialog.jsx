@@ -28,7 +28,23 @@ const UploadDocumentDialog = ({
     const [file, setFile] =
         useState(null);
 
+    const handleClose = () => {
+        setDocumentType("");
+        setFile(null);
+
+        onClose();
+    };
     const handleUpload = async () => {
+
+        if (!documentType) {
+
+            onSuccess(
+                "Please select document type",
+                "error"
+            );
+
+            return;
+        }
 
         if (!file) {
 
@@ -42,23 +58,24 @@ const UploadDocumentDialog = ({
 
         try {
 
-            await uploadStudentPhoto(
+            await uploadStudentDocument(
                 studentId,
+                documentType,
                 file
             );
 
             onSuccess(
-                "Photo uploaded successfully",
+                "Document uploaded successfully",
                 "success"
             );
 
-            onClose();
+            handleClose();
 
         } catch (error) {
 
             onSuccess(
                 error.response?.data?.message ||
-                "Failed to upload photo",
+                "Failed to upload document",
                 "error"
             );
         }
@@ -66,7 +83,7 @@ const UploadDocumentDialog = ({
     return (
         <Dialog
             open={open}
-            onClose={onClose}
+            onClose={handleClose}
         >
             <DialogTitle>
                 Upload Document
@@ -86,6 +103,7 @@ const UploadDocumentDialog = ({
                     }
                     sx={{ mt: 2 }}
                 >
+                    
                     <MenuItem value="LC">
                         LC
                     </MenuItem>
@@ -117,11 +135,10 @@ const UploadDocumentDialog = ({
             <DialogActions>
 
                 <Button
-                    onClick={onClose}
+                    onClick={handleClose}
                 >
                     Cancel
                 </Button>
-
                 <Button
                     variant="contained"
                     onClick={handleUpload}
