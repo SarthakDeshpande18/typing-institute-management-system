@@ -1,5 +1,6 @@
 package com.typinginstitute.backend.entity;
 
+import com.typinginstitute.backend.enums.PaymentMode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +24,8 @@ public class FeePayment {
 
     private LocalDate paymentDate;
 
-    private String paymentMode;
+    @Enumerated(EnumType.STRING)
+    private PaymentMode paymentMode;
 
     private String remarks;
 
