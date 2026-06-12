@@ -34,4 +34,5 @@ public class StudentResponse {
     private BigDecimal paidFee;
 
     private BigDecimal remainingFee;
+    private String photoUrl;
 }
