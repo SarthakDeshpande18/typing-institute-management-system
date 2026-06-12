@@ -28,3 +28,12 @@ export const updateStudent = async (
 
   return response.data;
 };
+
+export const createStudent = async (request) => {
+  const response = await axiosInstance.post(
+    "/students/createStudent",
+    request
+  );
+
+  return response.data;
+};
