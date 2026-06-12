@@ -4,12 +4,16 @@ import com.typinginstitute.backend.dto.request.StudentRequest;
 import com.typinginstitute.backend.dto.response.StudentResponse;
 import com.typinginstitute.backend.entity.FeePayment;
 import com.typinginstitute.backend.entity.Student;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
 
 public class StudentMapper {
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     public static Student toEntity(StudentRequest request) {
 
@@ -25,7 +29,7 @@ public class StudentMapper {
                 .build();
     }
 
-    public static StudentResponse toResponse(Student student) {
+    public static StudentResponse toResponse(Student student, String baseUrl) {
 
         BigDecimal paidFee = Optional.ofNullable(student.getFeePayments())
                 .orElse(Collections.emptyList())
@@ -35,6 +39,12 @@ public class StudentMapper {
 
         BigDecimal remainingFee =
                 student.getTotalFee().subtract(paidFee);
+
+        String photoUrl = null;
+
+        if (student.getPhotoPath() != null && !student.getPhotoPath().isBlank()) {
+            photoUrl = baseUrl + "/" + student.getPhotoPath().replace("\\", "/");
+        }
 
         return StudentResponse.builder()
                 .id(student.getId())
@@ -49,6 +59,7 @@ public class StudentMapper {
                 .totalFee(student.getTotalFee())
                 .paidFee(paidFee)
                 .remainingFee(remainingFee)
+                .photoUrl(photoUrl)
                 .build();
     }
 }

@@ -49,6 +49,9 @@ public class StudentServiceImpl implements StudentService {
     @Value("${file.document-upload-dir}")
     private String documentUploadDir;
 
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     @Override
     @Transactional
     public StudentResponse createStudent(StudentRequest request) {
@@ -66,7 +69,7 @@ public class StudentServiceImpl implements StudentService {
 
         Student savedStudent = studentRepository.save(student);
 
-        return StudentMapper.toResponse(savedStudent);
+        return StudentMapper.toResponse(savedStudent,baseUrl);
     }
 
     @Transactional(readOnly = true)
@@ -80,7 +83,7 @@ public class StudentServiceImpl implements StudentService {
                                 "Student not found with id : " + id
                         ));
 
-        return StudentMapper.toResponse(student);
+        return StudentMapper.toResponse(student,baseUrl);
     }
 
 
@@ -133,7 +136,7 @@ public class StudentServiceImpl implements StudentService {
         return new PageResult<>(
                 studentPage.getContent()
                         .stream()
-                        .map(StudentMapper::toResponse)
+                        .map(student -> StudentMapper.toResponse(student, baseUrl))
                         .toList(),
 
                 studentPage.getNumber() + 1,
@@ -178,7 +181,7 @@ public class StudentServiceImpl implements StudentService {
                 studentRepository.save(student);
 
         return StudentMapper.toResponse(
-                updatedStudent
+                updatedStudent,baseUrl
         );
     }
 
@@ -221,9 +224,9 @@ public class StudentServiceImpl implements StudentService {
                 originalFilename.substring(originalFilename.lastIndexOf(".")
                 ).toLowerCase();
 
-        if (!extension.equals(".jpg") && !extension.equals(".jpeg")) {
+        if (!extension.equals(".jpg") && !extension.equals(".jpeg") && !extension.equals(".png")) {
 
-            throw new BadRequestException("Only JPG and JPEG files are allowed");
+            throw new BadRequestException("Only JPG, JPEG and PNG files are allowed");
         }
 
         try {
