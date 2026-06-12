@@ -16,13 +16,16 @@ import {
   IconButton,
 } from "@mui/material";
 
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import DescriptionIcon from "@mui/icons-material/Description";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { getStudents, deleteStudent, } from "../services/studentService";
-
+import UploadPhotoDialog from "../components/UploadPhotoDialog";
+import UploadDocumentDialog from "../components/UploadDocumentDialog";
 
 const StudentListPage = () => {
 
@@ -39,7 +42,17 @@ const StudentListPage = () => {
       message: "",
       severity: "success",
     });
+  const [photoOpen,
+    setPhotoOpen] =
+    useState(false);
 
+  const [documentOpen,
+    setDocumentOpen] =
+    useState(false);
+
+  const [selectedStudentId,
+    setSelectedStudentId] =
+    useState(null);
   const [students, setStudents] = useState([]);
 
   const [loading, setLoading] = useState(false);
@@ -154,7 +167,8 @@ const StudentListPage = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      flex: 1,
+      minWidth: 250,
       sortable: false,
 
       renderCell: (params) => (
@@ -194,7 +208,36 @@ const StudentListPage = () => {
           >
             <DeleteIcon />
           </IconButton>
+
+          <IconButton
+            color="primary"
+            onClick={() => {
+
+              setSelectedStudentId(
+                params.row.id
+              );
+
+              setPhotoOpen(true);
+            }}
+          >
+            <PhotoCameraIcon />
+          </IconButton>
+
+          <IconButton
+            color="secondary"
+            onClick={() => {
+
+              setSelectedStudentId(
+                params.row.id
+              );
+
+              setDocumentOpen(true);
+            }}
+          >
+            <DescriptionIcon />
+          </IconButton>
         </>
+
       ),
     }
 
@@ -311,6 +354,33 @@ const StudentListPage = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+
+      <UploadPhotoDialog
+        open={photoOpen}
+        onClose={() => setPhotoOpen(false)}
+        studentId={selectedStudentId}
+        onSuccess={(message, severity = "success") =>
+          setSnackbar({
+            open: true,
+            message,
+            severity,
+          })
+        }
+      />
+
+      <UploadDocumentDialog
+        open={documentOpen}
+        onClose={() => setDocumentOpen(false)}
+        studentId={selectedStudentId}
+        onSuccess={(message, severity = "success") =>
+          setSnackbar({
+            open: true,
+            message,
+            severity,
+          })
+        }
+      />
     </>
 
 

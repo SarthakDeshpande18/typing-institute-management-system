@@ -44,3 +44,64 @@ export const deleteStudent = async (id) => {
 
   return response.data;
 };
+
+
+export const uploadStudentPhoto = async (
+  id,
+  file
+) => {
+
+  const formData = new FormData();
+
+  formData.append(
+    "file",
+    file
+  );
+
+  const response =
+    await axiosInstance.post(
+      `/students/${id}/photo`,
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "multipart/form-data",
+        },
+      }
+    );
+
+  return response.data;
+};
+
+export const uploadStudentDocument = async (
+  id,
+  documentType,
+  file
+) => {
+
+  const formData = new FormData();
+
+  formData.append(
+    "documentType",
+    documentType
+  );
+
+  formData.append(
+    "file",
+    file
+  );
+
+  const response =
+    await axiosInstance.post(
+      `/students/${id}/documents`,
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "multipart/form-data",
+        },
+      }
+    );
+
+  return response.data;
+};
