@@ -322,7 +322,9 @@ public class StudentServiceImpl implements StudentService {
             return new DocumentUploadResponse(
                     savedDocument.getId(),
                     savedDocument.getDocumentType(),
-                    savedDocument.getFilePath()
+                    savedDocument.getFilePath(),
+                    savedDocument.getStudent().getId(),
+                    savedDocument.getStudent().getRegNo()
             );
 
         } catch (IOException ex) {

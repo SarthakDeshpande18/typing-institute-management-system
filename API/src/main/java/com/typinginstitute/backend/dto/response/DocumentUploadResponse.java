@@ -13,4 +13,7 @@ public class DocumentUploadResponse {
     private DocumentType documentType;
 
     private String filePath;
+
+    private Long studentId;
+    private String regNo;
 }
