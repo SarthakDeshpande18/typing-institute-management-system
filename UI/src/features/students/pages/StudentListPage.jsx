@@ -6,19 +6,39 @@ import {
   Typography,
   TextField,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Snackbar,
+  Alert,
+  IconButton,
 } from "@mui/material";
 
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { getStudents, deleteStudent, } from "../services/studentService";
 
-import { IconButton } from "@mui/material";
-import { getStudents } from "../services/studentService";
 
 const StudentListPage = () => {
 
   const navigate = useNavigate();
+  const [deleteId, setDeleteId] =
+    useState(null);
+
+  const [openDialog, setOpenDialog] =
+    useState(false);
+
+  const [snackbar, setSnackbar] =
+    useState({
+      open: false,
+      message: "",
+      severity: "success",
+    });
 
   const [students, setStudents] = useState([]);
 
@@ -67,6 +87,33 @@ const StudentListPage = () => {
     }
   };
 
+  const confirmDelete = async () => {
+    try {
+      await deleteStudent(deleteId);
+
+      setSnackbar({
+        open: true,
+        message: "Student deleted successfully",
+        severity: "success",
+      });
+
+      fetchStudents();
+    } catch (error) {
+      console.error(error);
+
+      setSnackbar({
+        open: true,
+        message:
+          error.response?.data?.message ||
+          "Failed to delete student",
+        severity: "error",
+      });
+    } finally {
+      setOpenDialog(false);
+      setDeleteId(null);
+    }
+  };
+
   useEffect(() => {
     fetchStudents();
   }, [paginationModel]);
@@ -107,20 +154,24 @@ const StudentListPage = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 120,
+      width: 150,
       sortable: false,
+
       renderCell: (params) => (
         <>
           <IconButton
             size="small"
             onClick={() =>
-              navigate(`/students/${params.row.id}`)
+              navigate(
+                `/students/${params.row.id}`
+              )
             }
           >
             <VisibilityIcon />
           </IconButton>
 
           <IconButton
+            size="small"
             onClick={() =>
               navigate(
                 `/students/edit/${params.row.id}`
@@ -128,6 +179,20 @@ const StudentListPage = () => {
             }
           >
             <EditIcon />
+          </IconButton>
+
+          <IconButton
+            size="small"
+            color="error"
+            onClick={() => {
+              setDeleteId(
+                params.row.id
+              );
+
+              setOpenDialog(true);
+            }}
+          >
+            <DeleteIcon />
           </IconButton>
         </>
       ),
@@ -192,7 +257,63 @@ const StudentListPage = () => {
           autoHeight
         />
       </Paper>
+
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+      >
+        <DialogTitle>
+          Delete Student
+        </DialogTitle>
+
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this student?
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            onClick={() => setOpenDialog(false)}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            color="error"
+            variant="contained"
+            onClick={confirmDelete}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() =>
+          setSnackbar({
+            ...snackbar,
+            open: false,
+          })
+        }
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
+
+
   );
 };
 

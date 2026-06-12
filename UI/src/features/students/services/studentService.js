@@ -37,3 +37,10 @@ export const createStudent = async (request) => {
 
   return response.data;
 };
+export const deleteStudent = async (id) => {
+  const response = await axiosInstance.delete(
+    `/students/${id}`
+  );
+
+  return response.data;
+};
