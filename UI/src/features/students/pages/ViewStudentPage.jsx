@@ -6,6 +6,10 @@ import {
     Grid,
     CircularProgress,
     Divider,
+    Chip,
+    Card,
+    CardContent,
+    Box,
 } from "@mui/material";
 
 import { useParams } from "react-router-dom";
@@ -81,9 +85,9 @@ const ViewStudentPage = () => {
                         variant="rounded"
                         sx={{
                             width: "100%",
-                            maxWidth: 450,
+                            maxWidth: 350,
                             height: 500,
-                            border: "3px solid #1976d2",
+                            border: "3px solid #d2191900",
                             boxShadow: 3,
                         }}
                     >
@@ -93,6 +97,127 @@ const ViewStudentPage = () => {
 
                 {/* Details Section */}
                 <Grid size={{ xs: 12, md: 9 }}>
+                    <Box mb={4}>
+                        <Typography
+                            variant="h4"
+                            fontWeight="bold"
+                        >
+                            {student.firstName} {student.lastName}
+                        </Typography>
+
+                        <Box sx={{ mt: 1 }}>
+                            <Typography
+                                component="span"
+                                color="text.main"
+                                sx={{
+                                    fontSize: "1.4rem",
+                                }}
+                            >
+                                Registration No :
+                            </Typography>
+
+                            <Typography
+                                component="span"
+                                sx={{
+                                    ml: 1,
+                                    fontSize: "1.3rem",
+                                    fontWeight: 600,
+                                    color: "text.main",
+                                    letterSpacing: 1,
+                                }}
+                            >
+                                {student.regNo}
+                            </Typography>
+                        </Box>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                gap: 1,
+                                mt: 2,
+                            }}
+                        >
+                            <Chip
+                                label="Active"
+                                color="success"
+                                size="large"
+                            />
+
+                            <Chip
+                                label={student.subject}
+                                color="primary"
+                                variant="outlined"
+                                size="large"
+                            />
+                        </Box>
+
+                        <Grid
+                            container
+                            spacing={2}
+                            sx={{ mt: 2, mb: 4 }}
+                        >
+                            <Grid size={{ xs: 12, md: 3 }}>
+                                <Card elevation={2}>
+                                    <CardContent>
+                                        <Typography color="text.secondary">
+                                            Total Fee
+                                        </Typography>
+
+                                        <Typography
+                                            variant="h5"
+                                            fontWeight="bold"
+                                        >
+                                            ₹ {student.totalFee}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 3 }}>
+                                <Card elevation={2}>
+                                    <CardContent>
+                                        <Typography color="text.secondary">
+                                            Paid Fee
+                                        </Typography>
+
+                                        <Typography
+                                            variant="h5"
+                                            fontWeight="bold"
+                                            color="success.main"
+                                        >
+                                            ₹ {student.paidFee}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 3 }}>
+                                <Card elevation={2}>
+                                    <CardContent>
+                                        <Typography color="text.secondary">
+                                            Remaining Fee
+                                        </Typography>
+
+                                        <Typography
+                                            variant="h5"
+                                            fontWeight="bold"
+                                            color="error.main"
+                                        >
+                                            ₹ {student.remainingFee}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                    <Typography
+                        variant="h5"
+                        fontWeight="bold"
+                        sx={{ mb: 2 }}
+                    >
+                        Student Information
+                    </Typography>
+
+                    <Divider sx={{ mb: 3 }} />
                     <Grid container spacing={3}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Typography color="text.secondary">
@@ -148,49 +273,23 @@ const ViewStudentPage = () => {
                             </Typography>
                         </Grid>
 
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography color="text.secondary">
-                                Subject
-                            </Typography>
-                            <Typography variant="h6">
-                                {student.subject}
-                            </Typography>
-                        </Grid>
 
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography color="text.secondary">
-                                Total Fee
-                            </Typography>
-                            <Typography variant="h6">
-                                ₹ {student.totalFee}
-                            </Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography color="text.secondary">
-                                Paid Fee
-                            </Typography>
-                            <Typography variant="h6">
-                                ₹ {student.paidFee}
-                            </Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography color="text.secondary">
-                                Remaining Fee
-                            </Typography>
-                            <Typography variant="h6">
-                                ₹ {student.remainingFee}
-                            </Typography>
-                        </Grid>
 
                         <Grid size={{ xs: 12 }}>
-                            <Typography color="text.secondary">
-                                Address
-                            </Typography>
-                            <Typography variant="h6">
-                                {student.address || "-"}
-                            </Typography>
+                            <Card elevation={1}>
+                                <CardContent>
+                                    <Typography
+                                        variant="subtitle1"
+                                        fontWeight="bold"
+                                    >
+                                        Address
+                                    </Typography>
+
+                                    <Typography>
+                                        {student.address || "-"}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
                         </Grid>
                     </Grid>
                 </Grid>
