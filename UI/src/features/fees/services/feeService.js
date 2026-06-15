@@ -19,9 +19,19 @@ export const payFee = async (payload) => {
     );
 };
 
-export const getPendingFees = async (payload) => {
+export const getPendingFees = async (
+    page = 0,
+    size = 10,
+    filters = {}
+) => {
+
     return await axiosInstance.post(
         "/fees/pending",
-        payload
+        {
+            currentPage: page,
+            pageSize: size,
+            sortBy: "id",
+            filters,
+        }
     );
 };
