@@ -105,7 +105,7 @@ public class StudentController {
     public ApiResponse<List<StudentDocumentResponse>> getStudentDocuments(
             @PathVariable Long id) {
 
-        return ApiResponse.ok(studentService.getStudentDocuments(id), "Document fetched successfully"
+        return ApiResponse.ok(studentService.getStudentDocuments(id), "Students Documents fetched successfully"
         );
     }
 
