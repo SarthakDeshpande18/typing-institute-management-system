@@ -8,8 +8,12 @@ export const PAYMENT_MODES = [
         label: "UPI",
     },
     {
-        value: "CARD",
-        label: "Card",
+        value: "Google_PAY",
+        label: "Google Pay",
+    },
+    {
+        value: "PHONE_PE",
+        label: "PhonePe",
     },
     {
         value: "BANK_TRANSFER",

@@ -7,7 +7,8 @@ import Select from "@mui/material/Select";
 import FormHelperText from "@mui/material/FormHelperText";
 import { PAYMENT_MODES } from "../../../constants/paymentModes";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 import {
     Paper,
@@ -191,14 +192,16 @@ const CollectFeePage = () => {
 
             <Button
                 startIcon={<ArrowBackIcon />}
-                onClick={() => navigate(-1)}
-                sx={{ mb: 2 }}
+                variant="outlined"
+                onClick={() =>
+                    navigate(`/students/${studentId}`)
+                }
             >
-                Back
+                Back to Student
             </Button>
 
             <Typography
-                variant="h4"
+                variant="h5"
                 fontWeight="bold"
                 mb={3}
             >
@@ -207,21 +210,29 @@ const CollectFeePage = () => {
 
             {summary && (
                 <>
-                    <Typography
-                        variant="h6"
-                        fontWeight="bold"
+                    <Paper
+                        elevation={2}
+                        sx={{
+                            p: 3,
+                            mb: 3,
+                            borderRadius: 3,
+                        }}
                     >
-                        {summary.studentName}
-                    </Typography>
+                        <Typography
+                            variant="h4"
+                            fontWeight="bold"
+                        >
+                            {summary.studentName}
+                        </Typography>
 
-                    <Typography
-                        variant="h6"
-                        fontWeight="bold"
+                        <Typography
+                            variant="h6"
+                            color="text.secondary"
+                        >
+                            {summary.regNo}
+                        </Typography>
 
-                        sx={{ mb: 4 }}
-                    >
-                        {summary.regNo}
-                    </Typography>
+                    </Paper>
 
                     <Grid
                         container
@@ -238,6 +249,7 @@ const CollectFeePage = () => {
                                 sx={{
                                     p: 3,
                                     borderRadius: 3,
+                                    bgcolor: "#e3f2fd",
                                 }}
                             >
                                 <Typography
@@ -266,6 +278,7 @@ const CollectFeePage = () => {
                                 sx={{
                                     p: 3,
                                     borderRadius: 3,
+                                    bgcolor: "#e8f5e9",
                                 }}
                             >
                                 <Typography
@@ -295,6 +308,7 @@ const CollectFeePage = () => {
                                 sx={{
                                     p: 3,
                                     borderRadius: 3,
+                                    bgcolor: "#ffebee",
                                 }}
                             >
                                 <Typography
@@ -465,7 +479,7 @@ const CollectFeePage = () => {
                                         size="large"
                                         onClick={handleCollectFee}
                                         sx={{
-                                            minWidth: 180,
+                                            minWidth: 220,
                                             height: 50,
                                         }}
                                     >
