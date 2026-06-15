@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
 
+import StudentDocumentsTable
+    from "../components/StudentDocumentsTable";
+
+import {
+    getStudentDocuments,
+    deleteStudentDocument,
+    getStudentById,
+} from "../services/studentService";
+
 import {
     Paper,
     Typography,
@@ -9,14 +18,31 @@ import {
     Chip,
     Card,
     CardContent,
+    Snackbar,
+    Alert,
     Box,
+    Avatar,
+    Button,
+    Stack,
 } from "@mui/material";
 
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
-import { Avatar } from "@mui/material";
-import { getStudentById } from "../services/studentService";
-import { Button } from "@mui/material";
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+} from "@mui/material";
+
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+
+import PaymentsIcon from "@mui/icons-material/Payments";
+
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+
+import SchoolIcon from "@mui/icons-material/School";
+
+import { useNavigate, useParams } from "react-router-dom";
 
 const ViewStudentPage = () => {
     const { id } = useParams();
@@ -26,11 +52,112 @@ const ViewStudentPage = () => {
 
     const photoUrl = student?.photoUrl || "";
     const navigate = useNavigate();
+    const [deleteDialogOpen, setDeleteDialogOpen] =
+        useState(false);
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    });
+    const [selectedDocumentId, setSelectedDocumentId] =
+        useState(null);
     const [loading, setLoading] = useState(true);
+    const handleOpenDeleteDialog = (
+        documentId
+    ) => {
+
+        setSelectedDocumentId(documentId);
+
+        setDeleteDialogOpen(true);
+    };
+    const [documents, setDocuments] =
+        useState([]);
 
     useEffect(() => {
         loadStudent();
+        loadDocuments();
     }, []);
+
+    const loadDocuments = async () => {
+
+        try {
+
+            const response =
+                await getStudentDocuments(id);
+
+            console.log(
+                "DOCUMENT RESPONSE",
+                response
+            );
+
+            setDocuments(
+                response.data
+            );
+
+        } catch (error) {
+
+            console.error(error);
+        }
+    };
+    const handleConfirmDelete =
+        async () => {
+
+            try {
+
+                await deleteStudentDocument(
+                    selectedDocumentId
+                );
+
+                loadDocuments();
+
+                setSnackbar({
+                    open: true,
+                    message:
+                        "Document deleted successfully",
+                    severity: "success",
+                });
+
+            } catch (error) {
+
+                setSnackbar({
+                    open: true,
+                    message:
+                        "Failed to delete document",
+                    severity: "error",
+                });
+            } finally {
+
+                setDeleteDialogOpen(false);
+
+                setSelectedDocumentId(null);
+            }
+        };
+    const handleDeleteDocument =
+        async (documentId) => {
+
+            const confirmed =
+                window.confirm(
+                    "Delete this document?"
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+
+                await deleteStudentDocument(
+                    documentId
+                );
+
+                loadDocuments();
+
+            } catch (error) {
+
+                console.error(error);
+
+            }
+        };
 
     const loadStudent = async () => {
         try {
@@ -78,236 +205,450 @@ const ViewStudentPage = () => {
 
             <Divider sx={{ mb: 4 }} />
 
-            <Grid container spacing={4}>
-                {/* Photo Section */}
-                <Grid size={{ xs: 12, md: 3 }}>
-                    <Avatar
-                        src={photoUrl}
-                        alt={student?.firstName}
-                        variant="rounded"
-                        sx={{
-                            width: "100%",
-                            maxWidth: 350,
-                            height: 500,
-                            border: "3px solid #d2191900",
-                            boxShadow: 3,
-                        }}
-                    >
-                        {student?.firstName?.charAt(0)}
-                    </Avatar>
-                </Grid>
+            <>
+                {/* Student Profile Card */}
+                <Card
+                    sx={{
+                        borderRadius: 4,
+                        mb: 4,
+                        boxShadow: 3,
+                    }}
+                >
+                    <CardContent sx={{ p: 4 }}>
+                        <Grid container spacing={4}>
+                            {/* Avatar */}
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <Box
+                                    display="flex"
+                                    justifyContent="center"
+                                >
+                                    <Avatar
+                                        src={photoUrl}
+                                        alt={student?.firstName}
+                                        sx={{
+                                            width: 320,
+                                            height: 320,
+                                            fontSize: 72,
+                                            bgcolor: "primary.main",
+                                            boxShadow: 4,
+                                        }}
+                                    >
+                                        {student?.firstName?.charAt(0)}
+                                    </Avatar>
+                                </Box>
+                            </Grid>
 
-                {/* Details Section */}
-                <Grid size={{ xs: 12, md: 9 }}>
-                    <Box mb={4}>
-                        <Typography
-                            variant="h4"
-                            fontWeight="bold"
-                        >
-                            {student.firstName} {student.lastName}
-                        </Typography>
+                            {/* Student Details */}
+                            <Grid size={{ xs: 12, md: 8 }}>
+                                <Box
+                                    sx={{
+                                        height: "100%",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    <Typography
+                                        variant="h3"
+                                        fontWeight={700}
+                                    >
+                                        {student.firstName} {student.lastName}
+                                    </Typography>
 
-                        <Box sx={{ mt: 1 }}>
-                            <Typography
-                                component="span"
-                                color="text.main"
-                                sx={{
-                                    fontSize: "1.4rem",
-                                }}
-                            >
-                                Registration No :
-                            </Typography>
+                                    <Typography
+                                        sx={{
+                                            mt: 1,
+                                            fontSize: "1.2rem",
+                                            color: "text.secondary",
+                                        }}
+                                    >
+                                        Registration No :
+                                        <strong>
+                                            {" "}
+                                            {student.regNo}
+                                        </strong>
+                                    </Typography>
 
-                            <Typography
-                                component="span"
-                                sx={{
-                                    ml: 1,
-                                    fontSize: "1.3rem",
-                                    fontWeight: 600,
-                                    color: "text.main",
-                                    letterSpacing: 1,
-                                }}
-                            >
-                                {student.regNo}
-                            </Typography>
-                        </Box>
-                        <Box
+                                    <Stack
+                                        direction="row"
+                                        spacing={2}
+                                        alignItems="center"
+                                        sx={{ mt: 3 }}
+                                    >
+                                        <Chip
+                                            label="Active"
+                                            color="success"
+                                        />
+
+                                        <Chip
+                                            label={student.subject}
+                                            color="primary"
+                                            variant="outlined"
+                                        />
+
+                                        <Button
+                                            variant="contained"
+                                            size="medium"
+                                            onClick={() =>
+                                                navigate(`/fees/${student.id}`)
+                                            }
+                                            sx={{
+                                                borderRadius: 2,
+                                                textTransform: "none",
+                                                fontWeight: 600,
+                                            }}
+                                        >
+                                            Collect Fee
+                                        </Button>
+                                    </Stack>
+                                </Box>
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                </Card>
+
+                {/* Fee Summary Cards */}
+                <Grid
+                    container
+                    spacing={3}
+                    sx={{ mb: 4 }}
+                >
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <Card
                             sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 2,
-                                mt: 2,
-                                flexWrap: "wrap",
+                                borderRadius: 4,
+                                borderLeft:
+                                    "5px solid #1976d2",
+                                height: "100%",
                             }}
                         >
-                            <Chip
-                                label="Active"
-                                color="success"
-                            />
-
-                            <Chip
-                                label={student.subject}
-                                color="primary"
-                                variant="outlined"
-                            />
-
-                            <Button
-                                variant="contained"
-                                size="medium"
-                                onClick={() =>
-                                    navigate(`/fees/${student.id}`)
-                                }
-                            >
-                                Collect Fee
-                            </Button>
-                        </Box>
-
-                        <Grid
-                            container
-                            spacing={2}
-                            sx={{ mt: 2, mb: 4 }}
-                        >
-                            <Grid size={{ xs: 12, md: 3 }}>
-                                <Card elevation={2}>
-                                    <CardContent>
+                            <CardContent>
+                                <Stack
+                                    direction="row"
+                                    justifyContent="space-between"
+                                >
+                                    <Box>
                                         <Typography color="text.secondary">
                                             Total Fee
                                         </Typography>
 
                                         <Typography
                                             variant="h5"
-                                            fontWeight="bold"
+                                            fontWeight={700}
                                         >
-                                            ₹ {student.totalFee}
+                                            ₹{" "}
+                                            {student.totalFee?.toLocaleString()}
                                         </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
+                                    </Box>
 
-                            <Grid size={{ xs: 12, md: 3 }}>
-                                <Card elevation={2}>
-                                    <CardContent>
+                                    <AccountBalanceWalletIcon
+                                        color="primary"
+                                        fontSize="large"
+                                    />
+                                </Stack>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <Card
+                            sx={{
+                                borderRadius: 4,
+                                borderLeft:
+                                    "5px solid #2e7d32",
+                                height: "100%",
+                            }}
+                        >
+                            <CardContent>
+                                <Stack
+                                    direction="row"
+                                    justifyContent="space-between"
+                                >
+                                    <Box>
                                         <Typography color="text.secondary">
                                             Paid Fee
                                         </Typography>
 
                                         <Typography
                                             variant="h5"
-                                            fontWeight="bold"
+                                            fontWeight={700}
                                             color="success.main"
                                         >
-                                            ₹ {student.paidFee}
+                                            ₹{" "}
+                                            {student.paidFee?.toLocaleString()}
                                         </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
+                                    </Box>
 
-                            <Grid size={{ xs: 12, md: 3 }}>
-                                <Card elevation={2}>
-                                    <CardContent>
+                                    <PaymentsIcon
+                                        color="success"
+                                        fontSize="large"
+                                    />
+                                </Stack>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 4 }}>
+                        <Card
+                            sx={{
+                                borderRadius: 4,
+                                borderLeft:
+                                    "5px solid #ed6c02",
+                                height: "100%",
+                            }}
+                        >
+                            <CardContent>
+                                <Stack
+                                    direction="row"
+                                    justifyContent="space-between"
+                                >
+                                    <Box>
                                         <Typography color="text.secondary">
-                                            Remaining Fee
+                                            Pending Fee
                                         </Typography>
 
                                         <Typography
                                             variant="h5"
-                                            fontWeight="bold"
-                                            color="error.main"
+                                            fontWeight={700}
+                                            color="warning.main"
                                         >
-                                            ₹ {student.remainingFee}
+                                            ₹{" "}
+                                            {student.remainingFee?.toLocaleString()}
                                         </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                    <Typography
-                        variant="h5"
-                        fontWeight="bold"
-                        sx={{ mb: 2 }}
-                    >
-                        Student Information
-                    </Typography>
+                                    </Box>
 
-                    <Divider sx={{ mb: 3 }} />
-                    <Grid container spacing={3}>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography color="text.secondary">
-                                Registration Number
-                            </Typography>
-                            <Typography variant="h6">
-                                {student.regNo}
-                            </Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography color="text.secondary">
-                                Admission Date
-                            </Typography>
-                            <Typography variant="h6">
-                                {student.admissionDate}
-                            </Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography color="text.secondary">
-                                First Name
-                            </Typography>
-                            <Typography variant="h6">
-                                {student.firstName}
-                            </Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography color="text.secondary">
-                                Last Name
-                            </Typography>
-                            <Typography variant="h6">
-                                {student.lastName}
-                            </Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography color="text.secondary">
-                                Mobile Number
-                            </Typography>
-                            <Typography variant="h6">
-                                {student.mobileNo}
-                            </Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Typography color="text.secondary">
-                                Mother Name
-                            </Typography>
-                            <Typography variant="h6">
-                                {student.motherName || "-"}
-                            </Typography>
-                        </Grid>
-
-
-
-                        <Grid size={{ xs: 12 }}>
-                            <Card elevation={1}>
-                                <CardContent>
-                                    <Typography
-                                        variant="subtitle1"
-                                        fontWeight="bold"
-                                    >
-                                        Address
-                                    </Typography>
-
-                                    <Typography>
-                                        {student.address || "-"}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
+                                    <WarningAmberIcon
+                                        color="warning"
+                                        fontSize="large"
+                                    />
+                                </Stack>
+                            </CardContent>
+                        </Card>
                     </Grid>
                 </Grid>
-            </Grid>
+
+                {/* Student Information */}
+                <Card
+                    sx={{
+                        borderRadius: 4,
+                        boxShadow: 2,
+                    }}
+                >
+                    <CardContent sx={{ p: 4 }}>
+                        <Typography
+                            variant="h6"
+                            fontWeight={700}
+                            gutterBottom
+                        >
+                            Student Information
+                        </Typography>
+
+                        <Divider sx={{ mb: 3 }} />
+
+                        <Grid container spacing={4}>
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    Registration Number
+                                </Typography>
+
+                                <Typography
+                                    fontWeight={600}
+                                >
+                                    {student.regNo}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    Admission Date
+                                </Typography>
+
+                                <Typography
+                                    fontWeight={600}
+                                >
+                                    {student.admissionDate}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    Subject
+                                </Typography>
+
+                                <Typography
+                                    fontWeight={600}
+                                >
+                                    {student.subject}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    First Name
+                                </Typography>
+
+                                <Typography
+                                    fontWeight={600}
+                                >
+                                    {student.firstName}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    Last Name
+                                </Typography>
+
+                                <Typography
+                                    fontWeight={600}
+                                >
+                                    {student.lastName}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    Mobile Number
+                                </Typography>
+
+                                <Typography
+                                    fontWeight={600}
+                                >
+                                    {student.mobileNo}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    Mother Name
+                                </Typography>
+
+                                <Typography
+                                    fontWeight={600}
+                                >
+                                    {student.motherName || "-"}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }}>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    Address
+                                </Typography>
+
+                                <Typography
+                                    fontWeight={600}
+                                >
+                                    {student.address || "-"}
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                </Card>
+            </>
+
+            <StudentDocumentsTable
+                documents={documents}
+                onDelete={handleOpenDeleteDialog}
+            />
+
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={() =>
+                    setDeleteDialogOpen(false)
+                }
+            >
+                <DialogTitle>
+                    Delete Document
+                </DialogTitle>
+
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to
+                        delete this document?
+
+                        <br />
+                        <br />
+
+                        This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button
+                        onClick={() =>
+                            setDeleteDialogOpen(false)
+                        }
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        color="error"
+                        variant="contained"
+                        onClick={
+                            handleConfirmDelete
+                        }
+                    >
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={3000}
+                onClose={() =>
+                    setSnackbar({
+                        ...snackbar,
+                        open: false,
+                    })
+                }
+                anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                }}
+            >
+                <Alert
+                    severity={snackbar.severity}
+                    variant="filled"
+                    onClose={() =>
+                        setSnackbar({
+                            ...snackbar,
+                            open: false,
+                        })
+                    }
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Paper>
     );
+
+
 };
 
 export default ViewStudentPage;

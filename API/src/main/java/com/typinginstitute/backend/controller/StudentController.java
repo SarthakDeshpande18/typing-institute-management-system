@@ -7,9 +7,13 @@ import com.typinginstitute.backend.enums.DocumentType;
 import com.typinginstitute.backend.service.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/students")
@@ -95,5 +99,29 @@ public class StudentController {
 
         return ApiResponse.ok(studentService.uploadDocument(id, documentType, file), "Document uploaded successfully"
         );
+    }
+
+    @GetMapping("/{id}/documents")
+    public ApiResponse<List<StudentDocumentResponse>> getStudentDocuments(
+            @PathVariable Long id) {
+
+        return ApiResponse.ok(studentService.getStudentDocuments(id), "Students Documents fetched successfully"
+        );
+    }
+
+    @GetMapping("/documents/{documentId}")
+    public ResponseEntity<Resource> getDocument(
+            @PathVariable Long documentId) {
+
+        return studentService.getDocument(documentId);
+    }
+
+    @DeleteMapping("/documents/{documentId}")
+    public ApiResponse<String> deleteDocument(
+            @PathVariable Long documentId) {
+
+        studentService.deleteDocument(documentId);
+
+        return ApiResponse.ok("Document deleted successfully");
     }
 }

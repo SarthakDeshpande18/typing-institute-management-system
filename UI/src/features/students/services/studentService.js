@@ -105,3 +105,27 @@ export const uploadStudentDocument = async (
 
   return response.data;
 };
+
+export const getStudentDocuments = async (
+  studentId
+) => {
+
+  const response =
+    await axiosInstance.get(
+      `/students/${studentId}/documents`
+    );
+
+  return response.data;
+};
+
+export const deleteStudentDocument = async (
+  documentId
+) => {
+
+  const response =
+    await axiosInstance.delete(
+      `/students/documents/${documentId}`
+    );
+
+  return response.data;
+};
