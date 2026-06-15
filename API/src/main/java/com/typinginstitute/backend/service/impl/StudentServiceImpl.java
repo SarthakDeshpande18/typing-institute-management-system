@@ -3,14 +3,22 @@ package com.typinginstitute.backend.service.impl;
 import com.typinginstitute.backend.dto.request.StudentFilterRequest;
 import com.typinginstitute.backend.dto.request.StudentRequest;
 import com.typinginstitute.backend.dto.request.StudentSearchPageRequest;
-import com.typinginstitute.backend.dto.response.DocumentUploadResponse;
-import com.typinginstitute.backend.dto.response.PageResult;
-import com.typinginstitute.backend.dto.response.PhotoUploadResponse;
-import com.typinginstitute.backend.dto.response.StudentResponse;
+import com.typinginstitute.backend.dto.response.*;
 import com.typinginstitute.backend.entity.Student;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import com.typinginstitute.backend.entity.StudentDocument;
 import com.typinginstitute.backend.enums.DocumentType;
 import com.typinginstitute.backend.exception.BadRequestException;
+import com.typinginstitute.backend.exception.ResourceNotFoundException;
+import com.typinginstitute.backend.mapper.StudentDocumentMapper;
 import com.typinginstitute.backend.mapper.StudentMapper;
 import com.typinginstitute.backend.repository.StudentDocumentRepository;
 import com.typinginstitute.backend.repository.StudentRepository;
@@ -19,10 +27,7 @@ import com.typinginstitute.backend.specifications.StudentSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.nio.file.StandardCopyOption;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.PageRequest;
@@ -31,10 +36,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -331,6 +333,82 @@ public class StudentServiceImpl implements StudentService {
 
             throw new RuntimeException("Failed to upload document");
         }
+    }
+
+    public List<StudentDocumentResponse> getStudentDocuments(Long studentId) {
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new  ResourceNotFoundException("Student not found"));
+
+        return student.getDocuments()
+                .stream()
+                .map(document ->
+                        StudentDocumentMapper.toResponse(document, baseUrl))
+                .toList();
+    }
+
+
+    @Override
+    public ResponseEntity<Resource> getDocument(Long documentId) {
+
+        StudentDocument document = studentDocumentRepository.findById(documentId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Document not found"));
+
+        try {
+
+            System.out.println("FILE PATH = " + document.getFilePath());
+
+            Path path = Paths.get(document.getFilePath());
+
+            Resource resource = new UrlResource(path.toUri());
+
+            if (!resource.exists()) {
+                throw new ResourceNotFoundException("File not found");
+            }
+
+            String contentType =
+                    Files.probeContentType(path);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(
+                            contentType != null
+                                    ? contentType
+                                    : MediaType.APPLICATION_OCTET_STREAM_VALUE
+                    ))
+                    .header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            "inline; filename=\"" +
+                                    path.getFileName().toString() +
+                                    "\""
+                    )
+                    .body(resource);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read document");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteDocument(Long documentId) {
+
+        StudentDocument document = studentDocumentRepository.findById(documentId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Document not found"));
+
+        try {
+
+            Path filePath = Paths.get(document.getFilePath());
+
+            Files.deleteIfExists(filePath);
+
+        } catch (IOException e) {
+
+            throw new RuntimeException("Unable to delete document file");
+        }
+
+        studentDocumentRepository.delete(document);
     }
 
     private String generateRegNo() {
