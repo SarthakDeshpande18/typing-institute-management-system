@@ -8,7 +8,7 @@ export const PAYMENT_MODES = [
         label: "UPI",
     },
     {
-        value: "Google_PAY",
+        value: "GOOGLE_PAY",
         label: "Google Pay",
     },
     {

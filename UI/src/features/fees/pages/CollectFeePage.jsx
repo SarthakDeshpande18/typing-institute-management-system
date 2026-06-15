@@ -8,8 +8,16 @@ import FormHelperText from "@mui/material/FormHelperText";
 import { PAYMENT_MODES } from "../../../constants/paymentModes";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
-
-
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from "@mui/material";
+import Chip from "@mui/material/Chip";
+import PaymentsIcon from "@mui/icons-material/Payments";
 import {
     Paper,
     Typography,
@@ -32,12 +40,15 @@ import {
 import {
     getFeeSummary,
     payFee,
+    getFeeHistory,
 } from "../services/feeService";
 
 
 const CollectFeePage = () => {
 
     const { studentId } = useParams();
+
+    const [history, setHistory] = useState([]);
 
     const navigate = useNavigate();
 
@@ -46,7 +57,10 @@ const CollectFeePage = () => {
         useState(null);
 
     useEffect(() => {
+
         loadSummary();
+        loadHistory();
+
     }, []);
 
     const [amountPaid, setAmountPaid] =
@@ -66,6 +80,25 @@ const CollectFeePage = () => {
         });
 
 
+    const loadHistory =
+        async () => {
+
+            try {
+
+                const response =
+                    await getFeeHistory(
+                        studentId
+                    );
+
+                setHistory(
+                    response.data.data
+                );
+
+            } catch (error) {
+
+                console.error(error);
+            }
+        };
 
     const loadSummary =
         async () => {
@@ -156,6 +189,7 @@ const CollectFeePage = () => {
                 setRemarks("");
 
                 loadSummary();
+                loadHistory();
 
             } catch (error) {
 
@@ -192,22 +226,42 @@ const CollectFeePage = () => {
 
             <Button
                 startIcon={<ArrowBackIcon />}
-                variant="outlined"
+                variant="text"
                 onClick={() =>
                     navigate(`/students/${studentId}`)
                 }
+                sx={{
+                    mb: 2,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: "1.50rem",
+                }}
             >
-                Back to Student
+                Back to Student Details
             </Button>
 
-            <Typography
-                variant="h5"
-                fontWeight="bold"
-                mb={3}
+            <Box
+                sx={{
+                    mb: 4,
+                    borderLeft: "4px solid #1976d2",
+                    pl: 2,
+                }}
             >
-                Collect Fee
-            </Typography>
+                <Typography
+                    variant="h4"
+                    fontWeight={700}
+                    gutterBottom
+                >
+                    Fee Collection
+                </Typography>
 
+                <Typography
+                    variant="body1"
+                    color="text.secondary"
+                >
+                    Manage student fee payments, balances and transaction records
+                </Typography>
+            </Box>
             {summary && (
                 <>
                     <Paper
@@ -485,6 +539,121 @@ const CollectFeePage = () => {
                                     >
                                         Collect Fee
                                     </Button>
+                                    <Paper
+                                        elevation={3}
+                                        sx={{
+                                            mt: 4,
+                                            p: 3,
+                                            borderRadius: 3,
+                                        }}
+                                    >
+                                        <Typography
+                                            variant="h5"
+                                            fontWeight="bold"
+                                            mb={3}
+                                        >
+                                            Fee History
+                                        </Typography>
+
+                                        <TableContainer>
+
+                                            <Table>
+
+                                                <TableHead>
+
+                                                    <TableRow>
+
+                                                        <TableCell>
+                                                            Sr. No.
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            Date
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            Amount
+                                                        </TableCell>
+
+                                                        <TableCell>
+
+                                                            paymentMode
+
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            Remarks
+                                                        </TableCell>
+
+                                                    </TableRow>
+
+                                                </TableHead>
+
+                                                <TableBody>
+
+                                                    {history.length > 0 ? (
+
+                                                        history.map((payment, index) => (
+
+                                                            <TableRow
+                                                                key={
+                                                                    payment.paymentId
+                                                                }
+                                                            >
+
+                                                                <TableCell>
+                                                                    {index + 1}
+                                                                </TableCell>
+
+                                                                <TableCell>
+                                                                    {payment.paymentDate}
+                                                                </TableCell>
+
+                                                                <TableCell>
+                                                                    ₹ {payment.amountPaid}
+                                                                </TableCell>
+
+                                                                <TableCell>
+
+                                                                    <Chip
+                                                                        label={payment.paymentMode}
+                                                                        color="primary"
+                                                                        size="small"
+                                                                    />
+
+                                                                </TableCell>
+
+                                                                <TableCell>
+                                                                    {payment.remarks || "-"}
+                                                                </TableCell>
+
+                                                            </TableRow>
+
+                                                        )
+                                                        )
+
+                                                    ) : (
+
+                                                        <TableRow>
+
+                                                            <TableCell
+                                                                colSpan={5}
+                                                                align="center"
+                                                            >
+                                                                No Fee History Found
+                                                            </TableCell>
+
+                                                        </TableRow>
+
+                                                    )}
+
+                                                </TableBody>
+
+                                            </Table>
+
+                                        </TableContainer>
+
+                                    </Paper>
                                 </Box>
 
                             </Grid>
