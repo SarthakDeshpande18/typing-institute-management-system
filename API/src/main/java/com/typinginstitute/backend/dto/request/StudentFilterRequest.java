@@ -19,4 +19,6 @@ public class StudentFilterRequest {
     private SubjectType subject;
 
     private String regNo;
+
+    private String search;
 }
