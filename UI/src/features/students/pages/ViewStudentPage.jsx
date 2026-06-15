@@ -134,26 +134,26 @@ const ViewStudentPage = () => {
                         <Box
                             sx={{
                                 display: "flex",
-                                gap: 1,
+                                alignItems: "center",
+                                gap: 2,
                                 mt: 2,
+                                flexWrap: "wrap",
                             }}
                         >
                             <Chip
                                 label="Active"
                                 color="success"
-                                size="large"
                             />
 
                             <Chip
                                 label={student.subject}
                                 color="primary"
                                 variant="outlined"
-                                size="large"
                             />
 
                             <Button
                                 variant="contained"
-                                sx={{ mt: 2 }}
+                                size="medium"
                                 onClick={() =>
                                     navigate(`/fees/${student.id}`)
                                 }

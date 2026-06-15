@@ -6,6 +6,9 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import FormHelperText from "@mui/material/FormHelperText";
 import { PAYMENT_MODES } from "../../../constants/paymentModes";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useNavigate} from "react-router-dom";
+
 import {
     Paper,
     Typography,
@@ -35,6 +38,8 @@ const CollectFeePage = () => {
 
     const { studentId } = useParams();
 
+    const navigate = useNavigate();
+
     const [summary,
         setSummary] =
         useState(null);
@@ -58,6 +63,7 @@ const CollectFeePage = () => {
             message: "",
             severity: "success",
         });
+
 
 
     const loadSummary =
@@ -182,10 +188,27 @@ const CollectFeePage = () => {
                 borderRadius: 4,
             }}
         >
+
+            <Button
+                startIcon={<ArrowBackIcon />}
+                onClick={() => navigate(-1)}
+                sx={{ mb: 2 }}
+            >
+                Back
+            </Button>
+
+            <Typography
+                variant="h4"
+                fontWeight="bold"
+                mb={3}
+            >
+                Collect Fee
+            </Typography>
+
             {summary && (
                 <>
                     <Typography
-                        variant="h4"
+                        variant="h6"
                         fontWeight="bold"
                     >
                         {summary.studentName}
@@ -193,7 +216,8 @@ const CollectFeePage = () => {
 
                     <Typography
                         variant="h6"
-                        color="text.secondary"
+                        fontWeight="bold"
+
                         sx={{ mb: 4 }}
                     >
                         {summary.regNo}
