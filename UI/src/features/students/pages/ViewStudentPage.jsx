@@ -12,9 +12,11 @@ import {
     Box,
 } from "@mui/material";
 
+import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { Avatar } from "@mui/material";
 import { getStudentById } from "../services/studentService";
+import { Button } from "@mui/material";
 
 const ViewStudentPage = () => {
     const { id } = useParams();
@@ -23,7 +25,7 @@ const ViewStudentPage = () => {
     const API_BASE_URL = "http://localhost:8080";
 
     const photoUrl = student?.photoUrl || "";
-
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -132,22 +134,32 @@ const ViewStudentPage = () => {
                         <Box
                             sx={{
                                 display: "flex",
-                                gap: 1,
+                                alignItems: "center",
+                                gap: 2,
                                 mt: 2,
+                                flexWrap: "wrap",
                             }}
                         >
                             <Chip
                                 label="Active"
                                 color="success"
-                                size="large"
                             />
 
                             <Chip
                                 label={student.subject}
                                 color="primary"
                                 variant="outlined"
-                                size="large"
                             />
+
+                            <Button
+                                variant="contained"
+                                size="medium"
+                                onClick={() =>
+                                    navigate(`/fees/${student.id}`)
+                                }
+                            >
+                                Collect Fee
+                            </Button>
                         </Box>
 
                         <Grid
