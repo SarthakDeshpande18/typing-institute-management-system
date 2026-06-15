@@ -52,17 +52,17 @@ const AppRoutes = () => {
             element={<EditStudentPage />}
           />
 
+          <Route
+            path="/fees/:studentId"
+            element={<CollectFeePage />}
+          />
+
+          <Route
+            path="/fees/pending"
+            element={<PendingFeesPage />}
+          />
+
         </Route>
-
-        <Route
-          path="/fees/:studentId"
-          element={<CollectFeePage />}
-        />
-
-        <Route
-          path="/fees/pending"
-          element={<PendingFeesPage />}
-        />
       </Routes>
     </BrowserRouter>
   );

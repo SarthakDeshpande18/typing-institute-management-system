@@ -14,6 +14,8 @@ import {
   Snackbar,
   Alert,
   IconButton,
+  Chip,
+  Tooltip,
 } from "@mui/material";
 
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
@@ -65,22 +67,27 @@ const StudentListPage = () => {
       pageSize: 5,
     });
 
-  const [filters, setFilters] = useState({
-    firstName: "",
-    lastName: "",
-    mobileNo: "",
-    regNo: "",
-  });
+  const [searchText, setSearchText] =
+    useState("");
 
-  const fetchStudents = async () => {
+  const [filters, setFilters] =
+    useState({
+      search: "",
+    });
+
+  const fetchStudents = async (
+    appliedFilters = filters
+  ) => {
     try {
       setLoading(true);
 
       const request = {
-        currentPage: paginationModel.page,
-        pageSize: paginationModel.pageSize,
+        currentPage:
+          paginationModel.page + 1,
+        pageSize:
+          paginationModel.pageSize,
         sortBy: "!id",
-        filters,
+        filters: appliedFilters,
       };
 
       const response =
@@ -129,7 +136,10 @@ const StudentListPage = () => {
 
   useEffect(() => {
     fetchStudents();
-  }, [paginationModel]);
+  }, [
+    paginationModel.page,
+    paginationModel.pageSize,
+  ]);
 
   const columns = [
     {
@@ -161,6 +171,18 @@ const StudentListPage = () => {
       field: "remainingFee",
       headerName: "Remaining Fee",
       flex: 1,
+
+      renderCell: (params) => (
+        <Chip
+          label={`₹ ${params.value}`}
+          color={
+            params.value > 0
+              ? "warning"
+              : "success"
+          }
+          size="small"
+        />
+      ),
     },
 
 
@@ -173,71 +195,69 @@ const StudentListPage = () => {
 
       renderCell: (params) => (
         <>
-          <IconButton
-            size="small"
-            onClick={() =>
-              navigate(
-                `/students/${params.row.id}`
-              )
-            }
-          >
-            <VisibilityIcon />
-          </IconButton>
+          <Tooltip title="View Student">
+            <IconButton
+              size="small"
+              onClick={() =>
+                navigate(`/students/${params.row.id}`)
+              }
+            >
+              <VisibilityIcon />
+            </IconButton>
+          </Tooltip>
 
-          <IconButton
-            size="small"
-            onClick={() =>
-              navigate(
-                `/students/edit/${params.row.id}`
-              )
-            }
-          >
-            <EditIcon />
-          </IconButton>
+          <Tooltip title="Edit Student">
+            <IconButton
+              size="small"
+              onClick={() =>
+                navigate(`/students/edit/${params.row.id}`)
+              }
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
 
-          <IconButton
-            size="small"
-            color="error"
-            onClick={() => {
-              setDeleteId(
-                params.row.id
-              );
+          <Tooltip title="Delete Student">
+            <IconButton
+              size="small"
+              color="error"
+              onClick={() => {
+                setDeleteId(params.row.id);
+                setOpenDialog(true);
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
 
-              setOpenDialog(true);
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
+          <Tooltip title="Upload Photo">
+            <IconButton
+              color="primary"
+              onClick={() => {
+                setSelectedStudentId(
+                  params.row.id
+                );
+                setPhotoOpen(true);
+              }}
+            >
+              <PhotoCameraIcon />
+            </IconButton>
+          </Tooltip>
 
-          <IconButton
-            color="primary"
-            onClick={() => {
-
-              setSelectedStudentId(
-                params.row.id
-              );
-
-              setPhotoOpen(true);
-            }}
-          >
-            <PhotoCameraIcon />
-          </IconButton>
-
-          <IconButton
-            color="secondary"
-            onClick={() => {
-
-              setSelectedStudentId(
-                params.row.id
-              );
-
-              setDocumentOpen(true);
-            }}
-          >
-            <DescriptionIcon />
-          </IconButton>
+          <Tooltip title="Upload Document">
+            <IconButton
+              color="secondary"
+              onClick={() => {
+                setSelectedStudentId(
+                  params.row.id
+                );
+                setDocumentOpen(true);
+              }}
+            >
+              <DescriptionIcon />
+            </IconButton>
+          </Tooltip>
         </>
-
       ),
     }
 
@@ -246,41 +266,222 @@ const StudentListPage = () => {
 
   return (
     <>
-      <Typography
-        variant="h4"
-        gutterBottom
+      <Paper
+        elevation={0}
+        sx={{
+          mb: 3,
+          p: 3,
+          borderRadius: 4,
+          background:
+           "linear-gradient(135deg, #198bd2 0%, #1565c0 100%)",
+          color: "white",
+          boxShadow: "0 8px 24px rgba(25,118,210,0.25)",
+        }}
       >
-        Students
-      </Typography>
-
-      <Paper sx={{ p: 2, mb: 2 }}>
         <Box
           display="flex"
+          alignItems="center"
           gap={2}
         >
-          <TextField
-            label="First Name"
-            value={filters.firstName}
-            onChange={(e) =>
-              setFilters({
-                ...filters,
-                firstName:
-                  e.target.value,
-              })
-            }
-          />
+         
+          <Box>
+            <Typography
+              variant="h4"
+              fontWeight={700}
+            >
+              Students
+            </Typography>
 
-          <Button
-            variant="contained"
-            onClick={fetchStudents}
-          >
-            Search
-          </Button>
+             <Typography
+              variant="h5"
+              fontWeight={700}
+            >
+              View, search and manage student records
+            </Typography>
+          </Box>
         </Box>
       </Paper>
 
-      <Paper>
+      <Paper
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 4,
+        }}
+      >
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(250px,1fr))",
+            gap: 3,
+            mb: 3,
+          }}
+        >
+          <Paper
+            sx={{
+              p: 3,
+              borderRadius: 4,
+              borderLeft:
+                "5px solid #1976d2",
+            }}
+          >
+            <Typography color="text.secondary">
+              Total Students
+            </Typography>
+
+            <Typography
+              variant="h4"
+              fontWeight={700}
+            >
+              {totalRows}
+            </Typography>
+          </Paper>
+
+          <Paper
+            sx={{
+              p: 3,
+              borderRadius: 4,
+              borderLeft:
+                "5px solid #2e7d32",
+            }}
+          >
+            <Typography color="text.secondary">
+              Current Page Records
+            </Typography>
+
+            <Typography
+              variant="h4"
+              fontWeight={700}
+            >
+              {students.length}
+            </Typography>
+          </Paper>
+
+          <Paper
+            sx={{
+              p: 3,
+              borderRadius: 4,
+              borderLeft:
+                "5px solid #ed6c02",
+            }}
+          >
+            <Typography color="text.secondary">
+              Pending Fees
+            </Typography>
+
+            <Typography
+              variant="h4"
+              fontWeight={700}
+            >
+              ₹
+              {students
+                .reduce(
+                  (sum, student) =>
+                    sum +
+                    (student.remainingFee ||
+                      0),
+                  0
+                )
+                .toLocaleString()}
+            </Typography>
+          </Paper>
+        </Box>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(250px,1fr))",
+            gap: 3,
+            mb: 3,
+          }}
+        ></Box>
+        <Typography
+          variant="h6"
+          fontWeight={600}
+          mb={2}
+        >
+          Search Students
+        </Typography>
+
+        <Box>
+          <TextField
+            fullWidth
+            placeholder="Search by First Name, Last Name or Reg No"
+            value={searchText}
+            onChange={(e) =>
+              setSearchText(e.target.value)
+            }
+          />
+
+          <Box
+            sx={{
+              mt: 2,
+              display: "flex",
+              gap: 2,
+            }}
+          >
+
+            <Button
+              variant="contained"
+              onClick={() => {
+                const newFilters = {
+                  search: searchText,
+                };
+
+                setFilters(newFilters);
+
+                fetchStudents(newFilters);
+              }}
+            >
+              Search
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={() => {
+                const newFilters = {
+                  search: "",
+                };
+
+                setSearchText("");
+
+                setFilters(newFilters);
+
+                fetchStudents(newFilters);
+              }}
+            >
+              Reset
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
+
+      <Paper
+        sx={{
+          borderRadius: 4,
+          overflow: "hidden",
+        }}
+      >
+
         <DataGrid
+          sx={{
+            border: 0,
+
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "#f8fafc",
+              fontWeight: 700,
+              borderBottom: "1px solid #e2e8f0",
+            },
+
+            "& .MuiDataGrid-row:hover": {
+              backgroundColor: "#f8fafc",
+            },
+
+            "& .MuiDataGrid-cell": {
+              borderColor: "#f1f5f9",
+            },
+          }}
           rows={students}
           columns={columns}
           loading={loading}

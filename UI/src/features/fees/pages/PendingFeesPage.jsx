@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Grid from "@mui/material/Grid";
-
 import {
     useEffect,
     useState,
@@ -118,26 +117,42 @@ const PendingFeesPage = () => {
                     Back to Dashboard
                 </Button>
 
-                <Box
+                <Paper
+                    elevation={0}
                     sx={{
-                        borderLeft: "4px solid #1976d2",
-                        pl: 2,
+                        mb: 3,
+                        p: 3,
+                        borderRadius: 4,
+                        background:
+                            "linear-gradient(135deg, #198bd2 0%, #1565c0 100%)",
+                        color: "white",
+                        boxShadow:
+                            "0 8px 24px rgba(220,38,38,0.25)",
                     }}
                 >
-                    <Typography
-                        variant="h4"
-                        fontWeight="bold"
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        gap={2}
                     >
-                        Pending Fees
-                    </Typography>
 
-                    <Typography
-                        variant="body1"
-                        color="text.secondary"
-                    >
-                        View and manage students with outstanding fee balances
-                    </Typography>
-                </Box>
+                        <Box>
+                            <Typography
+                                variant="h4"
+                                fontWeight={700}
+                            >
+                                Pending Fees
+                            </Typography>
+
+                            <Typography
+                                variant="h6"
+                                fontWeight={700}
+                            >
+                                View and manage students with outstanding fee balances
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Paper>
 
             </Box>
 
