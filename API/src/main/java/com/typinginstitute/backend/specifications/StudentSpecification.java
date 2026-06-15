@@ -21,15 +21,43 @@ public class StudentSpecification {
                     cb.isTrue(root.get("active"))
             );
 
-            if (filters.getFirstName() != null &&
-                    !filters.getFirstName().isBlank()) {
+            if (filters.getSearch() != null &&
+                    !filters.getSearch().isBlank()) {
+
+                String search =
+                        "%" +
+                                filters.getSearch().toLowerCase()
+                                + "%";
+
+                Predicate firstNamePredicate =
+                        cb.like(
+                                cb.lower(
+                                        root.get("firstName")
+                                ),
+                                search
+                        );
+
+                Predicate lastNamePredicate =
+                        cb.like(
+                                cb.lower(
+                                        root.get("lastName")
+                                ),
+                                search
+                        );
+
+                Predicate regNoPredicate =
+                        cb.like(
+                                cb.lower(
+                                        root.get("regNo")
+                                ),
+                                search
+                        );
 
                 predicates.add(
-                        cb.like(
-                                cb.lower(root.get("firstName")),
-                                "%" +
-                                        filters.getFirstName().toLowerCase()
-                                        + "%"
+                        cb.or(
+                                firstNamePredicate,
+                                lastNamePredicate,
+                                regNoPredicate
                         )
                 );
             }
@@ -49,9 +77,11 @@ public class StudentSpecification {
                     !filters.getRegNo().isBlank()) {
 
                 predicates.add(
-                        cb.equal(
-                                root.get("regNo"),
-                                filters.getRegNo()
+                        cb.like(
+                                cb.lower(root.get("regNo")),
+                                "%" +
+                                        filters.getRegNo().toLowerCase()
+                                        + "%"
                         )
                 );
             }

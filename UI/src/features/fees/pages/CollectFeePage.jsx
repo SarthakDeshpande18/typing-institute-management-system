@@ -240,28 +240,36 @@ const CollectFeePage = () => {
                 Back to Student Details
             </Button>
 
-            <Box
+            <Paper
+                elevation={0}
                 sx={{
                     mb: 4,
-                    borderLeft: "4px solid #1976d2",
-                    pl: 2,
+                    p: 3,
+                    borderRadius: 4,
+                    background:
+                        "linear-gradient(135deg, #198bd2 0%, #1565c0 100%)",
+                    color: "white",
+                    boxShadow:
+                        "0 8px 24px rgba(16,185,129,0.25)",
                 }}
             >
                 <Typography
                     variant="h4"
                     fontWeight={700}
-                    gutterBottom
+                    sx={{
+                        mb: 0.5,
+                    }}
                 >
                     Fee Collection
                 </Typography>
 
                 <Typography
-                    variant="body1"
-                    color="text.secondary"
+                    variant="h5"
+                    fontWeight={700}
                 >
                     Manage student fee payments, balances and transaction records
                 </Typography>
-            </Box>
+            </Paper>
             {summary && (
                 <>
                     <Paper
