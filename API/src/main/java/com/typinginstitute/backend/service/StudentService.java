@@ -2,12 +2,13 @@ package com.typinginstitute.backend.service;
 
 import com.typinginstitute.backend.dto.request.StudentRequest;
 import com.typinginstitute.backend.dto.request.StudentSearchPageRequest;
-import com.typinginstitute.backend.dto.response.DocumentUploadResponse;
-import com.typinginstitute.backend.dto.response.PageResult;
-import com.typinginstitute.backend.dto.response.PhotoUploadResponse;
-import com.typinginstitute.backend.dto.response.StudentResponse;
+import com.typinginstitute.backend.dto.response.*;
 import com.typinginstitute.backend.enums.DocumentType;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface StudentService {
 
@@ -25,4 +26,12 @@ public interface StudentService {
     );
 
     DocumentUploadResponse uploadDocument(Long studentId, DocumentType documentType, MultipartFile file);
+
+    // Get All Documents of Student
+    List<StudentDocumentResponse> getStudentDocuments(Long studentId);
+
+    ResponseEntity<Resource> getDocument(Long documentId);
+
+    // Delete Document
+    void deleteDocument(Long documentId);
 }
