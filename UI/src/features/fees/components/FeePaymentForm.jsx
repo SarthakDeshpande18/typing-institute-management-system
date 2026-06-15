@@ -1,0 +1,4 @@
+<TextField
+    fullWidth
+    label="Amount"
+/>
