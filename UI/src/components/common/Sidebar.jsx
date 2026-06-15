@@ -13,8 +13,9 @@ import {
   ListItemText,
   Toolbar,
 } from "@mui/material";
-
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import PaymentsIcon from "@mui/icons-material/Payments";
 import { useAuth } from "../../context/AuthContext";
 
 const drawerWidth = 240;
@@ -68,6 +69,18 @@ const Sidebar = () => {
             <PersonAdd />
           </ListItemIcon>
           <ListItemText primary="Add Student" />
+        </ListItemButton>
+
+        <ListItemButton
+          component={Link}
+          to="/fees/pending"
+        >
+          <ListItemIcon>
+            <PaymentsIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Pending Fees"
+          />
         </ListItemButton>
 
         <ListItemButton onClick={handleLogout}>
