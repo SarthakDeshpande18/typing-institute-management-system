@@ -48,7 +48,8 @@ const ViewStudentPage = () => {
     const { id } = useParams();
 
     const [student, setStudent] = useState(null);
-    const API_BASE_URL = "http://localhost:8080";
+    // const API_BASE_URL = "http://localhost:8080";
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     const photoUrl = student?.photoUrl || "";
     const navigate = useNavigate();
