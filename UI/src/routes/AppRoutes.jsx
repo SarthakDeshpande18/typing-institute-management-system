@@ -10,15 +10,32 @@ import EditStudentPage from "../features/students/pages/EditStudentPage";
 import DashboardLayout from "../layouts/DashboardLayout";
 import CollectFeePage from "../features/fees/pages/CollectFeePage";
 import PendingFeesPage from "../features/fees/pages/PendingFeesPage";
+import Register from "../features/auth/pages/Register";
+import { Navigate } from "react-router-dom";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* Public Routes */}
+
         <Route
           path="/"
+          element={<Navigate to="/register" replace />}
+        />
+
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        <Route
+          path="/login"
           element={<LoginPage />}
         />
+
+        {/* Protected Routes */}
 
         <Route
           element={
