@@ -129,6 +129,14 @@ const CreateStudentPage = () => {
     } catch (error) {
 
       console.error(error);
+       setSnackbar({
+    open: true,
+    message:
+      error?.response?.data?.message ||
+      "Failed to create student",
+    severity: "error",
+  });
+
 
     } finally {
 
