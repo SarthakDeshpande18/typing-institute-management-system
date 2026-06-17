@@ -25,8 +25,14 @@ const Sidebar = () => {
   const { logout } = useAuth();
 
   const handleLogout = () => {
+    sessionStorage.setItem(
+      "logoutMessage",
+      "Logout Successful"
+    );
+
     logout();
-    navigate("/");
+
+    navigate("/login");
   };
 
   return (

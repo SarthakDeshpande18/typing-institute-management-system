@@ -304,7 +304,7 @@ const StudentListPage = () => {
 
       <Paper
         sx={{
-          p: 3,
+          p: 2,
           mb: 3,
           borderRadius: 4,
         }}
@@ -314,86 +314,8 @@ const StudentListPage = () => {
             display: "grid",
             gridTemplateColumns:
               "repeat(auto-fit,minmax(250px,1fr))",
-            gap: 3,
-            mb: 3,
-          }}
-        >
-          <Paper
-            sx={{
-              p: 3,
-              borderRadius: 4,
-              borderLeft:
-                "5px solid #1976d2",
-            }}
-          >
-            <Typography color="text.secondary">
-              Total Students
-            </Typography>
-
-            <Typography
-              variant="h4"
-              fontWeight={700}
-            >
-              {totalRows}
-            </Typography>
-          </Paper>
-
-          <Paper
-            sx={{
-              p: 3,
-              borderRadius: 4,
-              borderLeft:
-                "5px solid #2e7d32",
-            }}
-          >
-            <Typography color="text.secondary">
-              Current Page Records
-            </Typography>
-
-            <Typography
-              variant="h4"
-              fontWeight={700}
-            >
-              {students.length}
-            </Typography>
-          </Paper>
-
-          <Paper
-            sx={{
-              p: 3,
-              borderRadius: 4,
-              borderLeft:
-                "5px solid #ed6c02",
-            }}
-          >
-            <Typography color="text.secondary">
-              Pending Fees
-            </Typography>
-
-            <Typography
-              variant="h4"
-              fontWeight={700}
-            >
-              ₹
-              {students
-                .reduce(
-                  (sum, student) =>
-                    sum +
-                    (student.remainingFee ||
-                      0),
-                  0
-                )
-                .toLocaleString()}
-            </Typography>
-          </Paper>
-        </Box>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit,minmax(250px,1fr))",
-            gap: 3,
-            mb: 3,
+            gap: 1,
+            mb: 1,
           }}
         ></Box>
         <Typography

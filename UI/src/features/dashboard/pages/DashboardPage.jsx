@@ -9,7 +9,7 @@ import {
     useEffect,
     useState,
 } from "react";
-
+import { useNavigate } from "react-router-dom";
 import DashboardCard from "../components/DashboardCard";
 
 import { getDashboard } from "../services/dashboardService";
@@ -19,7 +19,7 @@ const DashboardPage = () => {
     const [dashboard,
         setDashboard] =
         useState(null);
-
+    const navigate = useNavigate();
     const [loading,
         setLoading] =
         useState(true);
@@ -88,12 +88,21 @@ const DashboardPage = () => {
                 spacing={4}
             >
                 <Grid size={{ xs: 12, md: 3 }}>
-                    <DashboardCard
-                        title="Total Students"
-                        value={
-                            dashboard.totalStudents
-                        }
-                    />
+                    <Box
+                        onClick={() => navigate("/students")}
+                        sx={{
+                            cursor: "pointer",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                                transform: "translateY(-4px)",
+                            },
+                        }}
+                    >
+                        <DashboardCard
+                            title="Total Students"
+                            value={dashboard.totalStudents}
+                        />
+                    </Box>
                 </Grid>
 
                 <Grid size={{ xs: 12, md: 3 }}>
