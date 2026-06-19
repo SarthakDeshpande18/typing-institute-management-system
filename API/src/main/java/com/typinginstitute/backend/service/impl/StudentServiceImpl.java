@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import com.typinginstitute.backend.exception.FileUploadException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -212,8 +214,7 @@ public class StudentServiceImpl implements StudentService {
                 .orElseThrow(() -> new BadRequestException("Student not found"));
 
         if (file == null || file.isEmpty()) {
-            throw new BadRequestException("Photo is required"
-            );
+            throw new BadRequestException("Photo is required");
         }
 
         String originalFilename = file.getOriginalFilename();
@@ -254,7 +255,7 @@ public class StudentServiceImpl implements StudentService {
 
         } catch (IOException ex) {
 
-            throw new RuntimeException("Failed to upload photo");
+            throw new FileUploadException("Failed to upload photo");
         }
     }
 
