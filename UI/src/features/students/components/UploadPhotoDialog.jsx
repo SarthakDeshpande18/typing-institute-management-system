@@ -21,9 +21,14 @@ const UploadPhotoDialog = ({
 
     const [file, setFile] =
         useState(null);
-
+    const handleClose = () => {
+        setFile(null);
+        onClose();
+    };
     const handleUpload = async () => {
 
+        console.log("Selected File:", file);
+        
         if (!file) {
 
             onSuccess(
@@ -41,12 +46,14 @@ const UploadPhotoDialog = ({
                 file
             );
 
+            setFile(null);
+
             onSuccess(
                 "Photo uploaded successfully",
                 "success"
             );
 
-            onClose();
+            handleClose();
 
         } catch (error) {
 
@@ -61,7 +68,7 @@ const UploadPhotoDialog = ({
     return (
         <Dialog
             open={open}
-            onClose={onClose}
+            onClose={handleClose}
         >
             <DialogTitle>
                 Upload Photo
@@ -81,7 +88,7 @@ const UploadPhotoDialog = ({
 
             <DialogActions>
                 <Button
-                    onClick={onClose}
+                    onClick={handleClose}
                 >
                     Cancel
                 </Button>
